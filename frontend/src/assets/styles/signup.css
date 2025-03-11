@@ -1,0 +1,58 @@
+/* Additional styles for the signup page */
+/* Add these to your landing.css file */
+
+.terms-link {
+    color: var(--button-bg);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .terms-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Password strength indicator */
+  .password-strength {
+    margin-top: 0.5rem;
+    height: 4px;
+    border-radius: 2px;
+    background-color: #e0e0e0;
+    overflow: hidden;
+  }
+  
+  .password-strength-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .password-strength-weak {
+    background-color: #f44336;
+    width: 33%;
+  }
+  
+  .password-strength-medium {
+    background-color: #ff9800;
+    width: 66%;
+  }
+  
+  .password-strength-strong {
+    background-color: #4caf50;
+    width: 100%;
+  }
+  
+  /* Adjusted form height for signup to account for more fields */
+  .signup-form {
+    gap: 1.25rem;
+  }
+  
+  /* Slight adjustments for mobile view */
+  @media (max-width: 768px) {
+    .login-card {
+      padding: 1.75rem 1.25rem;
+    }
+    
+    .form-group {
+      gap: 0.25rem;
+    }
+  }

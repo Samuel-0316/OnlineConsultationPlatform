@@ -1,0 +1,297 @@
+/* Additional styles for the login page */
+/* Add these to your landing.css file */
+
+/* Header styling for login page */
+.login-header {
+  justify-content: space-between;
+  padding: 1rem 0;
+}
+
+.centered-logo {
+  margin: 0 auto;
+}
+
+.theme-toggle {
+  position: absolute;
+  right: 1rem;
+}
+
+.login-section {
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 0;
+  background-image: var(--hero-gradient);
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container {
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.login-container.hidden {
+  opacity: 0;
+  transform: translateY(2.5rem) scale(0.95);
+}
+
+.login-container.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.login-card {
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 2.5rem 2rem;
+  width: 100%;
+}
+
+.login-title {
+  color: var(--text-primary);
+  font-size: 1.875rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid var(--text-secondary);
+  border-radius: 0.5rem;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.form-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.forgot-password {
+  color: var(--button-bg);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  font-weight: 600;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 1rem;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  background-color: var(--button-hover);
+}
+
+.login-icon {
+  transition: transform 0.2s ease;
+}
+
+.login-btn:hover .login-icon {
+  transform: translateX(0.25rem);
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: var(--text-secondary);
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--text-secondary);
+  opacity: 0.3;
+}
+
+.login-divider span {
+  padding: 0 1rem;
+  font-size: 0.875rem;
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.social-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--text-secondary);
+  background-color: transparent;
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.social-login-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark-theme .social-login-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.register-prompt {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.register-link {
+  color: var(--button-bg);
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .login-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.5rem;
+  }
+  
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .login-section {
+    padding: 2rem 0;
+  }
+}
+
+/* Dark mode adjustments for form elements */
+.dark-theme .form-input {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-theme .form-input:focus {
+  border-color: var(--accent-color);
+}
+
+/* Footer styling for login page */
+.login-footer {
+  background-color: var(--footer-bg);
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.login-footer .footer-bottom {
+  border-top: none;
+  padding-top: 0;
+}

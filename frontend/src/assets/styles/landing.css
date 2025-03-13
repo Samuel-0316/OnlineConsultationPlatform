@@ -159,6 +159,7 @@
     text-decoration: none;
     position: relative;
     transition: color 0.3s ease;
+    cursor: pointer;
   }
   
   .nav-link::after {

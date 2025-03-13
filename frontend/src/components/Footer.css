@@ -1,0 +1,153 @@
+.footer {
+  margin-top: auto;
+  padding: 2rem 0;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  position: relative;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.05),
+    transparent
+  );
+}
+
+.dark-theme .footer::before {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.2),
+    transparent
+  );
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  margin-left: 35px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--accent-color);
+}
+
+.footer-social {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-link {
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-link:hover {
+  color: var(--accent-color);
+  background-color: var(--hover-bg);
+  transform: translateY(-2px);
+}
+
+.footer-bottom {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.footer-brand {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.dark-theme .footer {
+  background-color: var(--card-bg);
+  border-top-color: var(--border-color);
+}
+
+.dark-theme .footer-bottom {
+  border-top-color: var(--border-color);
+}
+
+.dark-theme .social-link:hover {
+  background-color: var(--hover-bg);
+}
+
+.footer-brand-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-description {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  max-width: 300px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2rem;
+    margin-left: 0;
+  }
+
+  .footer-description {
+    max-width: 100%;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .footer-social {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .footer-links a {
+    padding: 0.5rem;
+  }
+
+  .footer-bottom {
+    font-size: 0.75rem;
+  }
+} 

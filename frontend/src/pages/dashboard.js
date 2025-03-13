@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Sun, Moon, Calendar, Clock, User, Search, Filter, 
-  ChevronDown, LogOut, Bell, Settings, CheckCircle, XCircle, Twitter, Linkedin, Facebook
+  Sun, Moon, Calendar, Clock, User, Filter, 
+  ChevronDown, LogOut, Settings, CheckCircle, XCircle, Twitter, Linkedin, Facebook
 } from 'lucide-react';
 import '../assets/styles/dashboard.css'
 import { Link, useNavigate } from 'react-router-dom';
@@ -91,31 +91,9 @@ const UserDashboard = () => {
     ]
   });
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   
   const navigate = useNavigate();
-  
-  const notifications = [
-    {
-      id: 1,
-      message: "Your appointment with Dr. Sarah Johnson is tomorrow at 10:00 AM",
-      time: "1 hour ago",
-      read: false
-    },
-    {
-      id: 2,
-      message: "Mark Williams confirmed your appointment request",
-      time: "Yesterday",
-      read: true
-    },
-    {
-      id: 3,
-      message: "Please complete feedback for your session with James Rodriguez",
-      time: "3 days ago",
-      read: true
-    }
-  ];
   
   useEffect(() => {
     setIsVisible(true);
@@ -132,12 +110,6 @@ const UserDashboard = () => {
 
   const toggleProfileMenu = () => {
     setProfileMenuOpen(!profileMenuOpen);
-    if (notificationsOpen) setNotificationsOpen(false);
-  };
-
-  const toggleNotifications = () => {
-    setNotificationsOpen(!notificationsOpen);
-    if (profileMenuOpen) setProfileMenuOpen(false);
   };
 
   const toggleFilter = () => {
@@ -180,6 +152,12 @@ const UserDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Add any logout logic here (e.g., clearing tokens, user data)
+    localStorage.clear(); // Clear any stored data
+    navigate('/'); // Redirect to home page
+  };
+
   return (
     <div className={`dashboard-container ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}>
       {/* Header */}
@@ -193,72 +171,20 @@ const UserDashboard = () => {
           </div>
           
           <div className="dashboard-header-right">
-            <div className="dashboard-search">
-              <Search size={18} className="search-icon" />
-              <input type="text" placeholder="Search..." className="search-input" />
-            </div>
-            
             <div className="dashboard-actions">
-              <button className="notification-btn" onClick={toggleNotifications}>
-                <Bell size={20} />
-                <span className="notification-badge">2</span>
-              </button>
-              
               <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
                 {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               
-              <div className="profile-dropdown">
-                <button className="profile-btn" onClick={toggleProfileMenu}>
-                  <img src="/api/placeholder/32/32" alt="User profile" className="profile-img" />
-                  <span className="profile-name">John Doe</span>
-                  <ChevronDown size={16} />
+              <div className="logout-container">
+                <button className="logout-btn" onClick={handleLogout}>
+                  <LogOut size={20} />
                 </button>
-                
-                {profileMenuOpen && (
-                  <div className="profile-menu">
-                    <Link to="/profile" className="profile-menu-item">
-                      <User size={16} />
-                      <span>My Profile</span>
-                    </Link>
-                    <Link to="/settings" className="profile-menu-item">
-                      <Settings size={16} />
-                      <span>Settings</span>
-                    </Link>
-                    <Link to="/logout" className="profile-menu-item">
-                      <LogOut size={16} />
-                      <span>Logout</span>
-                    </Link>
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
       </header>
-
-      {/* Notifications dropdown */}
-      {notificationsOpen && (
-        <div className="notifications-dropdown">
-          <div className="notifications-header">
-            <h3>Notifications</h3>
-            <button className="mark-all-read">Mark all as read</button>
-          </div>
-          <div className="notifications-list">
-            {notifications.map(notification => (
-              <div key={notification.id} className={`notification-item ${!notification.read ? 'unread' : ''}`}>
-                <div className="notification-content">
-                  <p>{notification.message}</p>
-                  <span className="notification-time">{notification.time}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <Link to="/notifications" className="view-all-notifications">
-            View all notifications
-          </Link>
-        </div>
-      )}
 
       {/* Main Dashboard Content */}
       <main className="dashboard-main">

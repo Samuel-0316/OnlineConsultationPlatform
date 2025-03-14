@@ -109,7 +109,7 @@ const HomePage = () => {
           
           <div className="steps-grid">
             {[
-              { step: "01", title: "Find Your Expert", description: "Browse through our verified consultants and find the right match" },
+              { step: "01", title: "Find Your Expert", description: "Browse through our verified consultants and find the correct match" },
               { step: "02", title: "Book Appointment", description: "Schedule a time that works for both you and the consultant" },
               { step: "03", title: "Get Consultation", description: "Connect via secure video call and receive expert advice" }
             ].map((step, index) => (

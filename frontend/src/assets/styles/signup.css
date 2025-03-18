@@ -56,3 +56,16 @@
       gap: 0.25rem;
     }
   }
+
+/* Footer styling for signup page */
+.login-footer {
+  background-color: var(--card-bg);
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.login-footer .footer-bottom {
+  border-top: none;
+  padding-top: 0;
+  color: var(--text-primary);
+}

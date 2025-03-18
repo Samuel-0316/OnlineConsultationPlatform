@@ -311,3 +311,193 @@
         width: 200px;
     }
 }
+
+/* Booking Modal Styles */
+.booking-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.booking-modal {
+    background: var(--card-bg);
+    border-radius: 1.5rem;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideUp 0.4s ease-out;
+    border: 1px solid var(--border-color);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+.modal-consultant-info {
+    display: flex;
+    padding: 2rem 2rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.modal-consultant-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-color);
+}
+
+.modal-consultant-details h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.modal-specialization {
+    margin: 0 0 0.5rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.modal-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-booking-form {
+    padding: 30px;
+    margin-right: 30px;
+}
+
+.modal-booking-form h3 {
+    margin: 0 0 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    background: var(--body-bg);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.modal-submit-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.modal-submit-btn:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dark theme adjustments for modal */
+.dark-theme .booking-modal {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .modal-submit-btn:hover {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Media queries for responsive modal */
+@media (max-width: 600px) {
+    .modal-consultant-info {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1.5rem 1rem;
+    }
+    
+    .modal-booking-form {
+        padding: 1rem 1.5rem 1.5rem;
+    }
+}

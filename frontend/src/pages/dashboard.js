@@ -194,10 +194,13 @@ const UserDashboard = () => {
               <h1>Welcome back, John!</h1>
               <p className="welcome-subtitle">Here's an overview of your appointments</p>
             </div>
-            <Link to="/appointments/new" className="new-appointment-btn">
+            <button 
+              className="new-appointment-btn" 
+              onClick={() => navigate('/consultants')}
+            >
               <Calendar size={18} />
               <span>New Appointment</span>
-            </Link>
+            </button>
           </div>
           
           {/* Dashboard Summary Cards */}

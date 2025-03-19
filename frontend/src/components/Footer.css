@@ -112,6 +112,38 @@
   max-width: 300px;
 }
 
+/* Add styling for the highlighted registration link */
+.footer-links .consultant-registration-link {
+  color: var(--accent-color);
+  font-weight: 500;
+  position: relative;
+  padding-right: 18px;
+  transition: all 0.3s ease;
+}
+
+.footer-links .consultant-registration-link:hover {
+  transform: translateY(-2px);
+}
+
+.footer-links .consultant-registration-link::after {
+  content: '→';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
+}
+
+.footer-links .consultant-registration-link:hover::after {
+  transform: translate(3px, -50%);
+}
+
+/* Add a subtle divider in the footer links to separate registration */
+.footer-links-group {
+  display: flex;
+  gap: 2rem;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .footer-content {
@@ -127,9 +159,21 @@
   }
 
   .footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .footer-links-group {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 1.5rem;
+  }
+
+  .footer-links .consultant-registration-link {
+    margin-top: 0.5rem;
   }
 
   .footer-social {

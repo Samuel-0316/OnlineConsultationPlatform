@@ -36,14 +36,42 @@ const SignUpPage = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert("Passwords don't match!");
       return;
     }
-    // Handle signup logic here
-    console.log('Signup attempted with:', { name, email, password, agreeTerms });
+    
+    try {
+      console.log('Attempting to register user:', { name, email });
+      
+      // Connect to the backend registration endpoint
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+      
+      const data = await response.json();
+      console.log('Response received:', response.status, data);
+      
+      if (response.ok) {
+        // Registration successful
+        console.log('Registration successful:', data);
+        alert('Registration successful! Please log in.');
+        navigate('/login');
+      } else {
+        // Registration failed
+        console.error('Registration failed:', data);
+        alert(`Registration failed: ${data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      alert(`Registration error: ${error.message}`);
+    }
   };
 
   return (
@@ -75,7 +103,6 @@ const SignUpPage = () => {
               <div className="form-group">
                 <label htmlFor="name" className="form-label">Full Name</label>
                 <div className="input-container">
-                  <User size={18} className="input-icon" />
                   <input 
                     type="text" 
                     id="name" 
@@ -91,7 +118,6 @@ const SignUpPage = () => {
               <div className="form-group">
                 <label htmlFor="email" className="form-label">Email</label>
                 <div className="input-container">
-                  <Mail size={18} className="input-icon" />
                   <input 
                     type="email" 
                     id="email" 
@@ -107,7 +133,6 @@ const SignUpPage = () => {
               <div className="form-group">
                 <label htmlFor="password" className="form-label">Password</label>
                 <div className="input-container">
-                  <Lock size={18} className="input-icon" />
                   <input 
                     type={showPassword ? "text" : "password"} 
                     id="password" 
@@ -131,7 +156,6 @@ const SignUpPage = () => {
               <div className="form-group">
                 <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                 <div className="input-container">
-                  <Lock size={18} className="input-icon" />
                   <input 
                     type={showConfirmPassword ? "text" : "password"} 
                     id="confirmPassword" 

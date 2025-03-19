@@ -152,10 +152,34 @@ const UserDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Add any logout logic here (e.g., clearing tokens, user data)
-    localStorage.clear(); // Clear any stored data
-    navigate('/'); // Redirect to home page
+  const handleLogout = async () => {
+    const user = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
+
+    try {
+      // Notify the server about the logout
+      const response = await fetch('http://localhost:5000/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: user.email }),
+      });
+
+      if (response.ok) {
+        console.log('Logout successful');
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+
+    // Clear user data from storage
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
+
+    // Redirect to login page
+    navigate('/login');
   };
 
   return (

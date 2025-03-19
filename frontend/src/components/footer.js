@@ -1,5 +1,5 @@
 import React from 'react';
-import { Twitter, Linkedin, Facebook } from 'lucide-react';
+import { Twitter, Linkedin, Facebook, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './Footer.css'; // Update the import path to match the file name exactly
 
@@ -16,10 +16,16 @@ const Footer = () => {
           </div>
           
           <div className="footer-links">
-            <Link to="/about">About</Link>
-            <Link to="/contact">Contact</Link>
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Service</Link>
+            <div className="footer-links-group">
+              <Link to="/about">About</Link>
+              <Link to="/contact">Contact</Link>
+              <Link to="/privacy">Privacy Policy</Link>
+              <Link to="/terms">Terms of Service</Link>
+            </div>
+            
+            <Link to="/consultant-registration" className="consultant-registration-link">
+              Become a Consultant
+            </Link>
           </div>
           
           <div className="footer-social">

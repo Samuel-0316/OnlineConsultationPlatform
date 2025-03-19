@@ -11,7 +11,8 @@ import './assets/styles/landing.css';
 import './assets/styles/signup.css';
 import './assets/styles/dashboard.css';
 import './assets/styles/consultants.css';
-import './assets/styles/consultantRegistration.css'
+import './assets/styles/consultantRegistration.css';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -20,9 +21,23 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/dashboard" element={<UserDashboard />} />
-        <Route path="/consultants" element={<Consultants />} />
+        {/* <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} /> */}
         <Route path="/consultant-registration" element={<ConsultantRegistration />} />
+        
+        {/* Protected routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <UserDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/consultants" element={
+          <ProtectedRoute>
+            <Consultants />
+          </ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );

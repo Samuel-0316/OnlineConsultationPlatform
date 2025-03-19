@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sun, Moon, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import '../assets/styles/login.css'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const LoginPage = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -11,7 +11,13 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Extract the return URL if it exists
+  const returnUrl = location.state?.returnUrl || '/dashboard';
   
   useEffect(() => {
     setIsVisible(true);
@@ -38,10 +44,52 @@ const LoginPage = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempted with:', { email, password, rememberMe });
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      console.log('Attempting to log in with:', email);
+      
+      // Connect to the backend login endpoint
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include'
+      });
+      
+      const data = await response.json();
+      console.log('Login response:', response.status, data);
+      
+      if (response.ok) {
+        // Login successful
+        console.log('Login successful:', data);
+        
+        // Store user data in localStorage for persistence
+        if (rememberMe) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        } else {
+          // Use sessionStorage if "remember me" is not checked
+          sessionStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
+        // Redirect to the return URL after successful login
+        navigate(returnUrl);
+      } else {
+        // Login failed
+        console.error('Login failed:', data);
+        setError(data.message || 'Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setError('An error occurred during login. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignupClick = () => {
@@ -73,12 +121,24 @@ const LoginPage = () => {
             <h1 className="login-title">Welcome Back Users</h1>
             <p className="login-subtitle">Login in to access your account</p>
             
+            {/* Show error message if there is one */}
+            {error && (
+              <div className="error-message" style={{ 
+                color: 'red', 
+                backgroundColor: 'rgba(255, 0, 0, 0.1)', 
+                padding: '10px', 
+                borderRadius: '5px',
+                marginBottom: '15px'
+              }}>
+                {error}
+              </div>
+            )}
+            
             <form className="login-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="email" className="form-label">Email</label>
                 <div className="input-container">
-                  <Mail size={18} className="input-icon" />
-                  <input 
+                  <input
                     type="email" 
                     id="email" 
                     className="form-input" 
@@ -93,7 +153,6 @@ const LoginPage = () => {
               <div className="form-group">
                 <label htmlFor="password" className="form-label">Password</label>
                 <div className="input-container">
-                  <Lock size={18} className="input-icon" />
                   <input 
                     type={showPassword ? "text" : "password"} 
                     id="password" 
@@ -127,9 +186,14 @@ const LoginPage = () => {
                 <a href="#" className="forgot-password">Forgot password?</a>
               </div>
               
-              <button type="submit" className="login-btn">
-                Login In
-                <ArrowRight size={18} className="login-icon" />
+              <button 
+                type="submit" 
+                className="login-btn" 
+                disabled={isLoading}
+                style={{ opacity: isLoading ? 0.7 : 1 }}
+              >
+                {isLoading ? 'Logging In...' : 'Login In'}
+                {!isLoading && <ArrowRight size={18} className="login-icon" />}
               </button>
             </form>
             

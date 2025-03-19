@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Upload, MapPin, Star, Calendar, Award, X, Check, AlertCircle } from 'lucide-react';
+import { User, Upload, MapPin, Star, Calendar, Award, X, Check, AlertCircle, Mail, Phone } from 'lucide-react';
 import '../assets/styles/consultantRegistration.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/footer.js';
@@ -9,6 +9,8 @@ const ConsultantRegistration = () => {
     const [isDarkTheme, setIsDarkTheme] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
+        email: '',
+        phone: '',
         profession: '',
         experience: '',
         location: '',
@@ -136,11 +138,19 @@ const ConsultantRegistration = () => {
         
         // Required fields
         if (!formData.name.trim()) newErrors.name = 'Name is required';
+        if (!formData.email.trim()) newErrors.email = 'Email is required';
+        else if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Email is invalid';
+        
+        if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+        else if (!/^[0-9+\-\s()]{8,20}$/.test(formData.phone)) newErrors.phone = 'Phone number is invalid';
+        
         if (!formData.profession.trim()) newErrors.profession = 'Profession is required';
         if (!formData.experience.trim()) newErrors.experience = 'Experience is required';
         if (!formData.location.trim()) newErrors.location = 'City is required';
         if (!formData.country.trim()) newErrors.country = 'Country is required';
-        if (!formData.profilePhoto) newErrors.profilePhoto = 'Profile photo is required';
+        
+        // Profile photo is now optional, so we remove this validation
+        // if (!formData.profilePhoto) newErrors.profilePhoto = 'Profile photo is required';
         
         // Check skills
         if (formData.skills.filter(skill => skill.trim()).length === 0) {
@@ -181,31 +191,91 @@ const ConsultantRegistration = () => {
         // Filter out empty skills
         const filteredSkills = formData.skills.filter(skill => skill.trim());
         
-        // Create form data to send
-        const submissionData = {
-            ...formData,
-            skills: filteredSkills
-        };
-        
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Use default placeholder image if no photo was uploaded
+            const photoBase64 = photoPreview || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzZiNzI4MCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlciI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI1Ii8+PHBhdGggZD0iTTIwIDIxdi0yYTcgNyAwIDAgMC0xNC0wdi0yIi8+PC9zdmc+';
             
-            // Handle successful submission
-            console.log('Submission data:', submissionData);
-            setSubmissionStatus('success');
+            // Create submission data
+            const submissionData = {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                profession: formData.profession,
+                experience: formData.experience,
+                location: formData.location,
+                country: formData.country,
+                profilePhoto: photoBase64,
+                skills: filteredSkills,
+                rating: parseFloat(formData.rating) || 0,
+                reviewCount: parseInt(formData.reviewCount) || 0
+            };
             
-            // Reset form after success
-            setTimeout(() => {
-                navigate('/consultants');
-            }, 2000);
+            console.log('Sending data to backend:', submissionData);
             
+            // Send data to the backend
+            const response = await fetch('http://localhost:5000/consultant-registration', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(submissionData)
+            });
+            
+            const data = await response.json();
+            console.log('Registration response:', response.status, data);
+            
+            if (response.ok) {
+                // Handle successful submission
+                setSubmissionStatus('success');
+                
+                // Update the success message to indicate redirection to landing page
+                const notificationContent = document.querySelector('.notification-content p');
+                if (notificationContent) {
+                    notificationContent.textContent = 'Registration successful! Redirecting to home page...';
+                }
+                
+                // Reset form after success and redirect to landing page
+                setTimeout(() => {
+                    navigate('/');
+                }, 2000);
+            } else {
+                // Handle errors
+                console.error('Registration failed:', data);
+                setSubmissionStatus('error');
+            }
         } catch (error) {
             console.error('Error submitting form:', error);
             setSubmissionStatus('error');
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    // Add a new function to handle form reset
+    const handleResetForm = () => {
+        setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            profession: '',
+            experience: '',
+            location: '',
+            country: '',
+            profilePhoto: null,
+            skills: [''],
+            rating: 0,
+            reviewCount: 0,
+        });
+        setPhotoPreview(null);
+        setErrors({});
+        
+        // Reset file input if it exists
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        
+        // Scroll back to top
+        window.scrollTo(0, 0);
     };
 
     return (
@@ -245,6 +315,40 @@ const ConsultantRegistration = () => {
                                     className={errors.name ? 'error' : ''}
                                 />
                                 {errors.name && <div className="error-message">{errors.name}</div>}
+                            </div>
+                            
+                            <div className="form-group">
+                                <label htmlFor="email">
+                                    <Mail size={18} />
+                                    Email Address <span className="required">*</span>
+                                </label>
+                                <input 
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="your.email@example.com"
+                                    className={errors.email ? 'error' : ''}
+                                />
+                                {errors.email && <div className="error-message">{errors.email}</div>}
+                            </div>
+                            
+                            <div className="form-group">
+                                <label htmlFor="phone">
+                                    <Phone size={18} />
+                                    Phone Number <span className="required">*</span>
+                                </label>
+                                <input 
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. +1 (234) 567-8901"
+                                    className={errors.phone ? 'error' : ''}
+                                />
+                                {errors.phone && <div className="error-message">{errors.phone}</div>}
                             </div>
                             
                             <div className="form-group">
@@ -319,7 +423,7 @@ const ConsultantRegistration = () => {
                         
                         {/* Profile Photo Section */}
                         <div className="form-section">
-                            <h2>Profile Photo</h2>
+                            <h2>Profile Photo (Optional)</h2>
                             
                             <div className="photo-upload-container">
                                 <div className="photo-preview">
@@ -435,8 +539,12 @@ const ConsultantRegistration = () => {
                         
                         {/* Form Actions */}
                         <div className="form-actions">
-                            <button type="button" className="cancel-btn" onClick={() => navigate('/consultants')}>
-                                Cancel
+                            <button 
+                                type="button" 
+                                className="reset-btn" 
+                                onClick={handleResetForm}
+                            >
+                                Reset
                             </button>
                             <button 
                                 type="submit" 
@@ -455,7 +563,7 @@ const ConsultantRegistration = () => {
                         {submissionStatus === 'success' ? (
                             <div className="notification-content">
                                 <Check size={24} />
-                                <p>Registration successful! Redirecting to consultants page...</p>
+                                <p>Registration successful! Redirecting to home page...</p>
                             </div>
                         ) : (
                             <div className="notification-content">

@@ -85,7 +85,7 @@
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 8px;
     border-radius: 0.75rem;
     border: 1px solid var(--border-color);
     background: var(--body-bg);
@@ -286,7 +286,8 @@
     border-top: 1px solid var(--border-color);
 }
 
-.cancel-btn {
+/* Reset Button Styling - This replaces the cancel-btn styles */
+.reset-btn {
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
     background-color: transparent;
@@ -297,9 +298,22 @@
     font-weight: 500;
 }
 
-.cancel-btn:hover {
+.reset-btn:hover {
     background-color: var(--hover-bg);
     color: var(--text-primary);
+}
+
+.reset-btn:active {
+    transform: translateY(1px);
+}
+
+/* Dark theme adjustments for reset button */
+.dark-theme .reset-btn {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-theme .reset-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .submit-btn {
@@ -390,7 +404,7 @@
     background-color: var(--error-color);
 }
 
-.dark-theme .cancel-btn:hover {
+.dark-theme .reset-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 

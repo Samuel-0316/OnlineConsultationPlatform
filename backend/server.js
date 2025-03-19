@@ -3,13 +3,17 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer"); 
 
 const app = express();
 app.use(cors({
   origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true
 }));
-app.use(express.json());
+
+// Increase the payload size limit
+app.use(express.json({ limit: '10mb' })); // Adjust the limit as needed
+app.use(express.urlencoded({ limit: '10mb', extended: true })); // For form submissions
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -21,11 +25,6 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "Connection error:"));
 db.once("open", () => console.log("Connected to MongoDB"));
 
-// Define a simple schema
-const UserSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-});
 
 // Define auth user schema
 const AuthUserSchema = new mongoose.Schema({
@@ -48,8 +47,150 @@ const AuthUserSchema = new mongoose.Schema({
   }
 });
 
-const User = mongoose.model("User", UserSchema);
+// Define Consultant schema
+const ConsultantSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  profession: {
+    type: String,
+    required: true
+  },
+  experience: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  country: {
+    type: String,
+    required: true
+  },
+  profilePhoto: {
+    type: String, // Store as base64 string
+    required: false
+  },
+  skills: {
+    type: [String],
+    required: true
+  },
+  rating: {
+    type: Number,
+    default: 0
+  },
+  reviewCount: {
+    type: Number,
+    default: 0
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+
 const AuthUser = mongoose.model("AuthUser", AuthUserSchema);
+const Consultant = mongoose.model("Consultant", ConsultantSchema);
+
+// For production, replace setupEmailTransporter with this:
+const setupProductionTransporter = () => {
+  // Ensure we have credentials
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+    console.error('Email credentials are missing in .env file');
+    return null;
+  }
+
+  console.log('Setting up email transport with user:', process.env.EMAIL_USER);
+  
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_APP_PASSWORD
+    },
+    debug: true, // Enable debug logs
+    logger: true  // Log information to the console
+  });
+  
+  return { transporter };
+};
+
+// Improved function to send confirmation email
+const sendConsultantRegistrationEmail = async (name, email) => {
+  try {
+    // Set up the email transporter
+    const emailService = await setupProductionTransporter();
+    
+    if (!emailService) {
+      throw new Error('Email transporter could not be set up');
+    }
+    
+    const { transporter } = emailService;
+    
+    const mailOptions = {
+      from: `"Consulting Platform" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Welcome to Our Consultant Network!',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #3b82f6;">Welcome to Our Consultant Network!</h1>
+          </div>
+          
+          <div style="margin-bottom: 30px;">
+            <p>Hello <strong>${name}</strong>,</p>
+            <p>Thank you for registering as a consultant on our platform. We're excited to have you join our community of professionals!</p>
+            <p>Your registration has been successfully received and is now being reviewed by our team. You will be notified once your profile is approved and visible to clients.</p>
+          </div>
+          
+          <div style="margin-bottom: 30px;">
+            <h2 style="color: #3b82f6; font-size: 18px;">What's Next?</h2>
+            <ul>
+              <li>Our team will review your profile information</li>
+              <li>Once approved, your profile will be visible to potential clients</li>
+              <li>You can update your profile information anytime by logging in</li>
+              <li>Start receiving consultation requests and grow your network!</li>
+            </ul>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <p>If you have any questions or need assistance, please don't hesitate to <a href="mailto:support@yourconsultingplatform.com" style="color: #3b82f6;">contact our support team</a>.</p>
+          </div>
+          
+          <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e1e1e1; color: #6b7280; font-size: 14px;">
+            <p>© ${new Date().getFullYear()} Your Consulting Platform. All rights reserved.</p>
+          </div>
+        </div>
+      `
+    };
+
+    console.log('Attempting to send email to:', email);
+    
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    
+    console.log(`Email sent successfully to ${email}`);
+    console.log('Message ID:', info.messageId);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error sending confirmation email:', error);
+    return { success: false, error: error.message };
+  }
+};
 
 // API Routes
 app.get("/", (req, res) => res.send("Server is running"));
@@ -176,6 +317,83 @@ app.post("/logout", (req, res) => {
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     console.error("Logout error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// Consultant Registration Route
+app.post("/consultant-registration", async (req, res) => {
+  try {
+    console.log('Consultant registration attempt:', req.body);
+    const { name, email, phone, profession, experience, location, country, profilePhoto, skills, rating, reviewCount } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !phone || !profession || !experience || !location || !country) {
+      return res.status(400).json({ message: "All required fields must be provided" });
+    }
+
+    if (!skills || skills.length === 0) {
+      return res.status(400).json({ message: "At least one skill is required" });
+    }
+
+    // Create new consultant
+    const newConsultant = new Consultant({
+      name,
+      email,
+      phone,
+      profession,
+      experience,
+      location,
+      country,
+      profilePhoto,
+      skills,
+      rating: parseFloat(rating) || 0,
+      reviewCount: parseInt(reviewCount) || 0
+    });
+
+    await newConsultant.save();
+    console.log('Consultant registered successfully:', newConsultant._id);
+
+    // Send confirmation email
+    let emailResult = { success: false, error: 'Email sending was not attempted' };
+    
+    try {
+      emailResult = await sendConsultantRegistrationEmail(name, email);
+      
+      if (emailResult.success) {
+        console.log(`Confirmation email sent to ${email}`);
+      } else {
+        console.warn(`Failed to send confirmation email to ${email}: ${emailResult.error}`);
+      }
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      emailResult = { success: false, error: emailError.message };
+    }
+
+    // Respond with success message regardless of email status
+    res.status(201).json({
+      success: true,
+      message: "Consultant registered successfully",
+      consultant: newConsultant,
+      emailStatus: emailResult.success ? 'sent' : 'failed',
+      emailError: emailResult.error || null
+    });
+  } catch (error) {
+    console.error("Consultant registration error:", error.stack);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message
+    });
+  }
+});
+
+// Add this route to fetch all consultants
+app.get("/consultants", async (req, res) => {
+  try {
+    const consultants = await Consultant.find();
+    res.status(200).json(consultants);
+  } catch (error) {
+    console.error("Error fetching consultants:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });

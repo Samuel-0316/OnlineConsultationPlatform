@@ -14,99 +14,50 @@ const Consultants = () => {
     const [bookingDate, setBookingDate] = useState('');
     const [bookingTime, setBookingTime] = useState('');
     const [bookingMessage, setBookingMessage] = useState('');
+    const [consultants, setConsultants] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Sample consultants data
-    const consultants = [
-        {
-            id: 1,
-            name: "Dr. Sarah Johnson",
-            profilePicture: "https://randomuser.me/api/portraits/women/1.jpg",
-            specialization: "Business Strategy",
-            category: "Business",
-            rating: 4.9,
-            reviewCount: 128,
-            experience: "15+ years",
-            location: "New York, USA",
-            expertise: ["Strategic Planning", "Growth Strategy", "Market Analysis"]
-        },
-        {
-            id: 2,
-            name: "Mark Williams",
-            profilePicture: "https://img.mensxp.com/media/content/2020/Mar/YouTube-Famous-Doctor-Mikhail-Varshavski-Is-Now-Going-Viral-For-His-Content-On-Coronavirus-1400x653_5e7ca6f69973f.jpeg?w=1100&h=513&cc=1",
-            specialization: "Dermatologist",
-            category: "Finance",
-            rating: 4.8,
-            reviewCount: 93,
-            experience: "12 years",
-            location: "London, UK",
-            expertise: ["Acne", "Hyperpigmentation", "Rash"]
-        },
-        {
-            id: 3,
-            name: "Dr. Sarah Johnson",
-            profilePicture: "https://randomuser.me/api/portraits/women/1.jpg",
-            specialization: "Business Strategy",
-            category: "Business",
-            rating: 4.9,
-            reviewCount: 128,
-            experience: "15+ years",
-            location: "New York, USA",
-            expertise: ["Strategic Planning", "Growth Strategy", "Market Analysis"]
-        },
-        {
-            id: 4,
-            name: "Mark Williams",
-            profilePicture: "https://img.mensxp.com/media/content/2020/Mar/YouTube-Famous-Doctor-Mikhail-Varshavski-Is-Now-Going-Viral-For-His-Content-On-Coronavirus-1400x653_5e7ca6f69973f.jpeg?w=1100&h=513&cc=1",
-            specialization: "Dermatologist",
-            category: "Finance",
-            rating: 4.8,
-            reviewCount: 93,
-            experience: "12 years",
-            location: "London, UK",
-            expertise: ["Acne", "Hyperpigmentation", "Rash"]
-        },
-        {
-            id: 5,
-            name: "Dr. Sarah Johnson",
-            profilePicture: "https://randomuser.me/api/portraits/women/1.jpg",
-            specialization: "Business Strategy",
-            category: "Business",
-            rating: 4.9,
-            reviewCount: 128,
-            experience: "15+ years",
-            location: "New York, USA",
-            expertise: ["Strategic Planning", "Growth Strategy", "Market Analysis"]
-        },
-        {
-            id: 6,
-            name: "Mark Williams",
-            profilePicture: "https://img.mensxp.com/media/content/2020/Mar/YouTube-Famous-Doctor-Mikhail-Varshavski-Is-Now-Going-Viral-For-His-Content-On-Coronavirus-1400x653_5e7ca6f69973f.jpeg?w=1100&h=513&cc=1",
-            specialization: "Dermatologist",
-            category: "Finance",
-            rating: 4.8,
-            reviewCount: 93,
-            experience: "12 years",
-            location: "London, UK",
-            expertise: ["Acne", "Hyperpigmentation", "Rash"]
-        }
-    ];
-
     useEffect(() => {
+        // Fetch consultants from the backend
+        const fetchConsultants = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch('http://localhost:5000/consultants');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log("Fetched consultants data:", data); // Debug log
+                
+                if (Array.isArray(data)) {
+                    setConsultants(data);
+                } else {
+                    console.error("Expected array but got:", typeof data);
+                    setError("Invalid data format received from server");
+                }
+            } catch (error) {
+                console.error("Error fetching consultants:", error);
+                setError(error.message || "Failed to fetch consultants");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchConsultants();
+
         // Scroll to top when component mounts
         window.scrollTo(0, 0);
         
         const savedTheme = localStorage.getItem('theme');
         setIsDarkTheme(savedTheme === 'dark');
         
-        // Add animation class to cards after mount
-        const cards = document.querySelectorAll('.consultant-card');
-        cards.forEach((card, index) => {
-            setTimeout(() => {
-                card.classList.add('visible');
-            }, index * 100);
-        });
+    }, []);
 
+    useEffect(() => {
         // Prevent scrolling when modal is open
         if (showModal) {
             document.body.style.overflow = 'hidden';
@@ -134,9 +85,9 @@ const Consultants = () => {
     };
 
     const filteredConsultants = consultants.filter(consultant => {
-        const matchesCategory = selectedCategory === 'All' || consultant.category === selectedCategory;
+        const matchesCategory = selectedCategory === 'All' || consultant.profession.includes(selectedCategory);
         const matchesSearch = consultant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            consultant.specialization.toLowerCase().includes(searchQuery.toLowerCase());
+                              consultant.profession.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
 
@@ -168,6 +119,18 @@ const Consultants = () => {
         closeBookingModal();
     };
 
+    // Function to add animation class to cards after they're rendered
+    useEffect(() => {
+        if (!loading && consultants.length > 0) {
+            const cards = document.querySelectorAll('.consultant-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('visible');
+                }, index * 100);
+            });
+        }
+    }, [loading, consultants]);
+
     return (
         <div className={`consultants-container ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}>
             <Navbar 
@@ -195,45 +158,69 @@ const Consultants = () => {
                     ))}
                 </div>
 
+                {loading && (
+                    <div className="loading-state">Loading consultants...</div>
+                )}
+
+                {error && (
+                    <div className="error-state">
+                        <p>Error: {error}</p>
+                        <button onClick={() => window.location.reload()}>Try Again</button>
+                    </div>
+                )}
+
+                {!loading && !error && filteredConsultants.length === 0 && (
+                    <div className="no-consultants-state">
+                        <p>No consultants found matching your criteria.</p>
+                    </div>
+                )}
+
                 <div className="consultants-grid">
                     {filteredConsultants.map(consultant => (
-                        <div key={consultant.id} className="consultant-card">
+                        <div key={consultant._id} className="consultant-card">
                             <div className="card-header">
                                 <img 
-                                    src={consultant.profilePicture} 
+                                    src={consultant.profilePhoto} 
                                     alt={consultant.name} 
                                     className="consultant-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = 'https://via.placeholder.com/150?text=Consultant';
+                                    }}
                                 />
                             </div>
                             
                             <div className="card-content">
                                 <h3 className="consultant-name">{consultant.name}</h3>
-                                <p className="consultant-specialization">{consultant.specialization}</p>
+                                <p className="consultant-specialization">{consultant.profession}</p>
                                 
                                 <div className="rating-container">
                                     <Star className="star-icon" size={16} fill="currentColor" />
-                                    <span className="rating">{consultant.rating}</span>
-                                    <span className="review-count">({consultant.reviewCount} reviews)</span>
+                                    <span className="rating">{consultant.rating || 0}</span>
+                                    <span className="review-count">({consultant.reviewCount || 0} reviews)</span>
                                 </div>
                                 
                                 <div className="consultant-details">
                                     <div className="detail-item">
                                         <Award size={16} />
-                                        <span>{consultant.experience}</span>
+                                        Experience:<span>{consultant.experience}</span>years
                                     </div>
                                     <div className="detail-item">
                                         <MapPin size={16} />
-                                        <span>{consultant.location}</span>
+                                        <span>{consultant.location}, {consultant.country}</span>
                                     </div>
                                 </div>
                                 
                                 <div className="expertise-tags">
-                                    {consultant.expertise.map((skill, index) => (
-                                        <span key={index} className="expertise-tag">{skill}</span>
-                                    ))}
+                                    {consultant.skills && Array.isArray(consultant.skills) ? 
+                                        consultant.skills.map((skill, index) => (
+                                            <span key={index} className="expertise-tag">{skill}</span>
+                                        )) : 
+                                        <span className="expertise-tag">No skills listed</span>
+                                    }
                                 </div>
                                 
-                                <button 
+                                <button
                                     className="book-btn"
                                     onClick={() => openBookingModal(consultant)}
                                 >
@@ -256,17 +243,21 @@ const Consultants = () => {
                         
                         <div className="modal-consultant-info">
                             <img 
-                                src={selectedConsultant.profilePicture} 
+                                src={selectedConsultant.profilePhoto} 
                                 alt={selectedConsultant.name} 
                                 className="modal-consultant-image"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = 'https://via.placeholder.com/150?text=Consultant';
+                                }}
                             />
                             <div className="modal-consultant-details">
                                 <h2>{selectedConsultant.name}</h2>
-                                <p className="modal-specialization">{selectedConsultant.specialization}</p>
+                                <p className="modal-specialization">{selectedConsultant.profession}</p>
                                 <div className="modal-rating">
                                     <Star className="star-icon" size={16} fill="currentColor" />
-                                    <span>{selectedConsultant.rating}</span>
-                                    <span>({selectedConsultant.reviewCount} reviews)</span>
+                                    <span>{selectedConsultant.rating || 0}</span>
+                                    <span>({selectedConsultant.reviewCount || 0} reviews)</span>
                                 </div>
                             </div>
                         </div>

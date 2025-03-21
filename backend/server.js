@@ -26,7 +26,7 @@ db.on("error", console.error.bind(console, "Connection error:"));
 db.once("open", () => console.log("Connected to MongoDB"));
 
 
-// Define auth user schema
+// Define auth user schema with authProvider field
 const AuthUserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -40,6 +40,10 @@ const AuthUserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  authProvider: {
+    type: String,
+    default: 'local' // 'local', 'google', etc.
   },
   createdAt: {
     type: Date,
@@ -395,6 +399,83 @@ app.get("/consultants", async (req, res) => {
   } catch (error) {
     console.error("Error fetching consultants:", error);
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// OAuth User Registration Route (for users who sign up with Google, etc.)
+app.post("/register-oauth-user", async (req, res) => {
+  try {
+    console.log('OAuth user registration:', req.body);
+    const { userId, name, email, authProvider } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Email is required for OAuth registration" 
+      });
+    }
+    
+    // Check if user already exists in your system
+    const existingUser = await AuthUser.findOne({ email });
+    
+    if (existingUser) {
+      // User exists, update their auth provider info if needed
+      console.log('OAuth user already exists:', email);
+      
+      // Update authProvider if it's not set or different
+      if (!existingUser.authProvider || existingUser.authProvider !== authProvider) {
+        await AuthUser.updateOne(
+          { _id: existingUser._id },
+          { $set: { authProvider } }
+        );
+        console.log('Updated auth provider for existing user:', email);
+      }
+      
+      return res.status(200).json({ 
+        success: true,
+        message: "User authenticated successfully", 
+        user: {
+          _id: existingUser._id,
+          name: existingUser.name,
+          email: existingUser.email,
+          authProvider: authProvider
+        }
+      });
+    }
+    
+    // Create a new user for OAuth providers
+    // Generate a secure random password for OAuth users
+    const securePassword = `oauth_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(securePassword, salt);
+    
+    const newUser = new AuthUser({
+      name,
+      email,
+      password: hashedPassword,
+      authProvider
+    });
+    
+    await newUser.save();
+    console.log('OAuth user created successfully:', newUser._id);
+    
+    res.status(201).json({ 
+      success: true, 
+      message: "OAuth user registered successfully",
+      user: {
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        authProvider: authProvider
+      }
+    });
+  } catch (error) {
+    console.error("OAuth registration error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Server error", 
+      error: error.message
+    });
   }
 });
 

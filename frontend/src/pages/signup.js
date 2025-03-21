@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Sun, Moon, Mail, Lock, User, ArrowRight, Eye, EyeOff,} from 'lucide-react';
 import '../assets/styles/signup.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { NhostClient } from '@nhost/nhost-js';
+
+// Initialize Nhost client
+const nhost = new NhostClient({
+  subdomain: 'tjoduzeputbseydstwij',
+  region: 'ap-south-1'
+});
 
 const SignUpPage = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,6 +20,8 @@ const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -74,6 +83,44 @@ const SignUpPage = () => {
     }
   };
 
+  // Add Google Sign-up function
+  const handleGoogleSignUp = async () => {
+    if (!agreeTerms) {
+      setError('Please agree to the Terms & Conditions before continuing');
+      return;
+    }
+    
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      // Get the current URL's origin for the redirect URL
+      const redirectUrl = `${window.location.origin}/auth-callback`;
+      
+      // Store that this was a signup attempt (for different handling in callback)
+      localStorage.setItem('authMode', 'signup');
+      
+      // Initiate Google sign-in with redirect
+      const { error } = await nhost.auth.signIn({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl
+        }
+      });
+      
+      if (error) {
+        console.error('Google sign-up error:', error);
+        setError(error.message || 'An error occurred during Google sign-up');
+      }
+      // No need for success handling here as we'll be redirected
+    } catch (error) {
+      console.error('Error during Google sign-up:', error);
+      setError('An error occurred during Google sign-up. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={`home-container ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}>
       {/* Header */}
@@ -98,6 +145,19 @@ const SignUpPage = () => {
           <div className="login-card">
             <h1 className="login-title">Create Your Account</h1>
             <p className="login-subtitle">Join us and start your journey</p>
+            
+            {/* Add error display */}
+            {error && (
+              <div className="error-message" style={{ 
+                color: 'red', 
+                backgroundColor: 'rgba(255, 0, 0, 0.1)', 
+                padding: '10px', 
+                borderRadius: '5px',
+                marginBottom: '15px'
+              }}>
+                {error}
+              </div>
+            )}
             
             <form className="login-form" onSubmit={handleSubmit}>
               <div className="form-group">
@@ -200,7 +260,11 @@ const SignUpPage = () => {
             </div>
             
             <div className="social-login">
-              <button className="social-login-btn google">
+              <button 
+                className="social-login-btn google"
+                onClick={handleGoogleSignUp}
+                disabled={isLoading}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>

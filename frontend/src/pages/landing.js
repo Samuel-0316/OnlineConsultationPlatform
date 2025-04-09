@@ -5,7 +5,6 @@ import consultImage from '../assets/images/doc_consult.png';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/footer.js';
 import Navbar from '../components/Navbar';
-// imports
 
 const HomePage = () => {
   const [isVisible, setIsVisible] = useState(false);

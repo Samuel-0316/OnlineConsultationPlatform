@@ -53,6 +53,13 @@ This platform offers a robust set of features for both users and consultants:
 - Upload an optional profile photo.
 - Receive a confirmation email upon successful registration.
 
+#### Profile Management:
+- Update profile information and track ratings/feedback from clients.
+
+#### Appointment Handling:
+- View and manage upcoming client appointments.
+- Receive notifications for new bookings and cancellations.
+
 ### General Features
 
 - **Responsive Design**: Optimized for various screen sizes (mobile, tablet, desktop).
@@ -97,3 +104,62 @@ The project is built using the following technologies:
 
 ```bash
 cd backend
+npm install
+# Create a .env file with your environment variables (Refer to .env.example if available)
+npm start
+```
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+---
+
+## Usage
+
+- Visit the frontend at `http://localhost:3000` after both servers are running.
+- Register as a user or consultant to explore platform features.
+- Consultants must complete profile registration and wait for approval before being listed.
+
+---
+
+## Project Structure
+
+```
+OnlineConsultationPlatform/
+│
+├── backend/
+│   ├── server.js
+│   └── ... (API routes, models, configs)
+│
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── ...
+│   └── ...
+│
+└── README.md
+```
+
+---
+
+## Contributing
+
+Contributions are welcome! Please fork the repository and open a pull request for any feature additions or bug fixes.
+
+---
+
+## License
+
+This project is for personal learning and does not currently include an open source license.
+
+---
+
+## Contact
+
+For questions or support, please contact [Samuel-0316](https://github.com/Samuel-0316).
